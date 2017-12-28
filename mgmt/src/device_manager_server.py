@@ -8,10 +8,9 @@
 """
 
 from flask import Flask, request, jsonify
-from mgmt.src.database_manager import DatabaseManager as db_manager
-from mgmt.src.utils import *
-from mgmt.src.constants import number_of_links,\
-    number_of_chunks,\
+from utils import *
+from constants import number_of_links, \
+    number_of_chunks, \
     number_of_rows
 
 app = Flask(__name__)
@@ -23,6 +22,17 @@ rows = distribute_index_servers()
     Internal Endpoints
 """
 
+@app.route('/', methods=['GET'])
+def distribute_rows():
+    """
+    Distribute index server into rows
+    :return:
+    """
+    global rows
+    rows = distribute_index_servers()
+    return jsonify(message="{0} rows have been distributed!".format(len(rows)))
+
+
 @app.route('/get_relation/<string:relation_name>', methods=['GET'])
 def get_relation(relation_name):
     """
@@ -33,9 +43,42 @@ def get_relation(relation_name):
     result = db_manager.get_relation(relation_name)
     return jsonify(result)
 
+
+@app.route('/add_hosts', methods=['POST'])
+def add_hosts():
+    """
+    Add host data in host relation
+    JSON format:
+    [
+        {
+            'host': host_url,
+            'type': host_type.
+        }
+    ]
+    :return:
+    """
+    message = request.get_json()
+    for component in message:
+        db_manager.operate_on_host_relation('INSERT',
+                                            host=component['host'],
+                                            type=component['type'])
+        global rows
+        rows = distribute_index_servers()
+    response = {'message': 'Successfully added hosts'}
+    return jsonify(response), 201
+
+
+@app.route('/clear_relation/<string:relation_name>', methods=['POST'])
+def clear_db(relation_name):
+    db_manager.clear_relation(relation_name=relation_name)
+    response = {'message': 'Successfully cleared the relation'}
+    return jsonify(response), 201
+
+
 """
     All Components' Endpoints
 """
+
 
 @app.route("/set_state/component", methods=['POST'])
 def set_component_state():
@@ -72,9 +115,11 @@ def set_component_state():
         response = {'message': 'Failed to set state'}
         return jsonify(response), 201
 
+
 """
     Crawlers' Endpoints
 """
+
 
 @app.route("/get_links", methods=['GET'])
 def get_links():
@@ -114,9 +159,10 @@ def get_links():
             db_manager.operate_on_link_relation('UPDATE_CHUNK_ID',
                                                 link=link,
                                                 chunk_id=chunk_id)
-        return jsonify(links=links)
+        return jsonify(chunk_id=chunk_id, links=links)
     else:
         return jsonify(links=[])
+
 
 @app.route("/set_state/link", methods=['POST'])
 def set_link_state():
@@ -158,6 +204,7 @@ def set_link_state():
         response = {'message': 'Failed to set state'}
         return jsonify(response), 201
 
+
 @app.route("/add_links", methods=['POST'])
 def add_links():
     """
@@ -165,14 +212,16 @@ def add_links():
     :return: 201 if successful, 200 if no links to add
     """
     links = request.get_json()
-    if links['links'] != []:
+    if links['links']:
         for link in links['links']:
-            db_manager.operate_on_link_relation('INSERT',link=link)
+            db_manager.operate_on_link_relation('INSERT', link=link)
+
         response = {'message': 'Successfully added links to database'}
         return jsonify(response), 201
     else:
         response = {'message': 'There are no links to add'}
         return jsonify(response), 200
+
 
 @app.route("/set_state/content_chunk", methods=['POST'])
 def set_content_chunk_state():
@@ -187,28 +236,39 @@ def set_content_chunk_state():
         # Get all links for that chunk id
         links = db_manager.get_links_for_chunk_id(chunk_id=chunk_id)
 
-        # Update state of all links to crawled
+        # Update state of all links to 'crawled'
         for entry in links:
             link = entry['link']
             db_manager.operate_on_link_relation('UPDATE_STATE',
                                                 link=link,
                                                 state='crawled')
 
-        # Update Crawler's chunk id task to crawled
+        # Update Crawler's chunk id task to 'crawled'
         db_manager.operate_on_crawler_relation('UPDATE_TASK',
                                                chunk_id=chunk_id,
                                                task='crawled')
 
         response = {'message': 'Successfully updated state to crawled'}
         return jsonify(response), 201
+    elif message['state'] == "propagated":
+        chunk_id = message['chunk_id']
+
+        # Update Crawler's chunk id task to 'propagated'
+        db_manager.operate_on_crawler_relation('UPDATE_TASK',
+                                               chunk_id=chunk_id,
+                                               task='propagated')
+
+        response = {'message': 'Successfully updated state to propagated'}
+        return jsonify(response), 201
     else:
         response = {'message': 'There is no state available'}
         return jsonify(response), 400
 
+
 @app.route('/get_chunks/unpropagated', methods=['GET'])
 def get_unpropagated_chunks():
     """
-    Get a list of unpropagated chunks
+    Get a list of un-propagated chunks
     :return: List of chunk ids
     """
     results = db_manager.get_first_n_built_chunk_ids(number_of_chunks)
@@ -217,9 +277,11 @@ def get_unpropagated_chunks():
         temp.append(chunk['chunk_id'])
     return jsonify(chunks=temp)
 
+
 """
     Index Builders' and Servers' Endpoints
 """
+
 
 @app.route("/set_state/index_chunk", methods=['POST'])
 def set_index_chunk_state():
@@ -229,16 +291,24 @@ def set_index_chunk_state():
     """
     message = request.get_json()
     if message['state'] == "built":
-        # Update content chunk state to 'built'
+        # Update index chunk state to 'built'
         db_manager.operate_on_index_builder_relation('UPDATE_TASK',
-                                                 chunk_id=message['chunk_id'],
-                                                 host=request.remote_addr,
-                                                 task=message['state'])
+                                                     chunk_id=message['chunk_id'],
+                                                     host=request.remote_addr,
+                                                     task=message['state'])
 
         # Assign content and index chunks to index servers after the index is built
         assign_index_chunk(rows, message['chunk_id'])
 
         response = {'message': 'Successfully updated state to built'}
+        return jsonify(response), 201
+    elif message['state'] == "propagated":
+        # Update index chunk state to 'propagated'
+        db_manager.operate_on_index_builder_relation('UPDATE_TASK',
+                                                     chunk_id=message['chunk_id'],
+                                                     task=message['state'])
+
+        response = {'message': 'Successfully updated state to propagated'}
         return jsonify(response), 201
     else:
         response = {'message': 'There is no state available'}
@@ -254,13 +324,11 @@ def get_content_chunk():
     # Get the first number_of_chunks crawled chunk ids
     results = db_manager.get_first_n_crawled_chunks(number_of_chunks)
 
-    print(results)
     temp_chunks = []
     if len(results) != 0:
         for chunk in results:
-            temp_dict = {}
-            temp_dict['chunk_id'] = chunk['chunk_id']
-            temp_dict['host'] = chunk['c_host']
+            temp_dict = {'chunk_id': chunk['chunk_id'],
+                         'host': chunk['c_host']}
             temp_chunks.append(temp_dict)
 
             # Insert to index builder relation and mark chunk as 'building'
@@ -273,17 +341,21 @@ def get_content_chunk():
     else:
         return jsonify([])
 
-@app.route("/get_chunks", methods=['GET'])
+
+@app.route("/get_chunks", methods=['POST'])
 def get_chunks():
     """
     Get the hosts of the content and index chunks assigned to an index server
     :return: List of dictionary of hosts, empty list if no chunks assigned
     """
-    requester = request.remote_addr
+    # requester = request.remote_addr
+    requester = request.get_json()['host']
+
     # Get all index servers for requester
     results = db_manager.get_chunk_hosts_for_index_servers(requester)
 
     return jsonify(results)
+
 
 @app.route("/get_map", methods=['GET'])
 def get_map():
@@ -295,21 +367,29 @@ def get_map():
     index_servers = db_manager.get_all_index_servers()
 
     temp = []
-    for i in range(number_of_rows):
-        temp.append([])
-    for server in index_servers:
-        index_server_host = server['host']
-        # Get chunk ids for a given Index Server's host
-        temp_dict = db_manager.get_chunk_ids_for_index_server(host=index_server_host)
+    try:
+        for i in range(number_of_rows):
+            temp.append([])
+        for server in index_servers:
+            index_server_host = server['host']
 
-        if len(temp_dict) != 0:
-            index = temp_dict['row'] - 1
-            temp[index].append({'host':temp_dict['host'],'chunk_id':temp_dict['chunk_ids']})
-    return temp
+            # Get chunk ids for a given Index Server's host
+            temp_dict = db_manager.get_chunk_ids_for_index_server(host=index_server_host)
+
+            if len(temp_dict) != 0:
+                index = temp_dict['row'] - 1
+                temp[index].append({'host': temp_dict['host'],
+                                    'chunk_ids': temp_dict['chunk_ids']})
+    except Exception as e:
+        temp = []
+        print(e)
+    return jsonify(temp)
+
 
 """
     WatchDog's Endpoints
 """
+
 
 @app.route("/set_health", methods=['POST'])
 def set_health():
@@ -318,10 +398,26 @@ def set_health():
     :return: None
     """
     message = request.get_json()
+
     # Update the health status in the database
     db_manager.operate_on_host_relation('UPDATE_HEALTH',
                                         host=message['host'],
                                         health=message['status'])
+    db_manager.operate_on_host_relation('UPDATE_STATE',
+                                        host=message['host'],
+                                        state=message['state'])
+    response = {'message': 'Successfully updated health'}
+    return jsonify(response), 201
+
+
+@app.route("/get_health", methods=['GET'])
+def get_health():
+    """
+    Sets the health status for components; called by watchdogs
+    :return: None
+    """
+    response = {'status': 'healthy'}
+    return jsonify(response), 201
 
 
 if __name__ == '__main__':
