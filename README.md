@@ -1,4 +1,5 @@
 # DarkDarkGo
+Duplicated from [Bennington-Distributed-Systems-2017/DarkDarkGo](https://github.com/Bennington-Distributed-Systems-2017/DarkDarkGo)
 
 ### Design
 ![DarkDarkGo Design](mgmt/doc/darkdarkgo_drawing.JPG)
