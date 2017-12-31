@@ -9,7 +9,7 @@ import requests
 import json
 import time
 from index_builder_final import Index_Builder
-from read_chunk import get_chunk
+from chunk_reader.read_chunk import get_chunk
 
 # REMINDER: Change this mgmt IP address once Mgmt is set up
 mgmt_ip_addr = '54.159.82.218'
@@ -21,7 +21,7 @@ print(online.json())
 while True:
     # Test Endpoint 2: Get content chunk metadata from Mgmt
     metadata = requests.get('http://{0}:5000/get_metadata/content_chunk'.format(mgmt_ip_addr))
-    #print(metadata.json())
+    print(metadata.json())
 
     chunk_ids = []
     crawler_ip_addrs = []
@@ -37,9 +37,6 @@ while True:
         time.sleep(5)
         continue
 
-    # print(chunk_ids)
-    # print(crawler_ip_addrs)
-
     # Test Endpoint 3: Get content chunk from Crawler
     for i in range(len(chunk_ids)):
         id_ = chunk_ids[i]
@@ -47,7 +44,6 @@ while True:
         # print(content_data.json())
 
         # Save the content chunk from Crawler into local json files
-        # (Not very confident whether this is needed)
         with open('sample_files/content_files/{0}'.format(id_), 'wb') as content_file:
             content_file.write(content_data.content)
         content_file.close()
@@ -55,6 +51,7 @@ while True:
         # Call function get_chunk from read_chunk.py to get a dictionary
         # that contains 'doc_id', 'link', 'title' and 'html' for 5 documents.
         content_chunk = get_chunk(id_)
+        print(content_chunk)
         
         # Call class Index_Builder to build index chunk
         indexer = Index_Builder(id_, content_chunk)
@@ -64,3 +61,10 @@ while True:
         data = {"chunk_id": id_, "state": "built"}
         index_chunk_metadata = requests.post('http://{0}:5000/set_state/index_chunk'.format(mgmt_ip_addr), json=data)
         # print(index_chunk_metadata.json())
+
+        # Test Endpoint 5: Sent Mgmt propagated function
+        mess = {"chunk_id": id_, "state": "propagated"}
+        propagated = requests.post('http://{0}:5000/set_state/content_chunk'.format(mgmt_ip_addr), json=mess)
+        print(propagated.json())
+
+    time.sleep(120)

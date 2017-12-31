@@ -59,7 +59,7 @@ class Index_Builder:
                 for pos, w in enumerate(all_words_in_one_entry):
                     if w == word:
                         word_positions.append(pos)
-                word_tuple = (word, word_count_in_entry[word], entry["doc_id"], word_positions)
+                word_tuple = (word, word_count_in_entry[word], self.chunk_id + '-' + str(entry["doc_id"]), word_positions)
                 entry_array.append(word_tuple)
 
             entries += entry_array
@@ -80,11 +80,11 @@ class Index_Builder:
                 indexed_words is a list of all words indexed, along with their corresponding
                 word_count and list of urls
         """
-        # Only choose words with frequency count >= 3
+        # Only choose words with frequency count >= 1
         for word in unique_words:
             indexed_word_info = {}
             entry_ids = []
-            if word_counts[word] >= 3:
+            if word_counts[word] >= 1:
                 indexed_word_info['word_count'] = word_counts[word]
 
                 for tup in entries:
@@ -95,8 +95,8 @@ class Index_Builder:
                         doc_ids = {}
                         for en_id in sorted(entry_ids, reverse=True):
                             doc_ids[en_id[1]] = en_id[2]
-                        # the value of key 'doc_ID' is now ranked
-                        indexed_word_info['doc_ID'] = doc_ids
+                        # the value of key 'doc_id' is now ranked
+                        indexed_word_info['doc_id'] = doc_ids
 
             if indexed_word_info:
                 indexed_words[word] = indexed_word_info
