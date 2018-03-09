@@ -1,4 +1,6 @@
 # DarkDarkGo
+This project aims to build a scalable search engine for the Dark web for
+educational purpose.
 
 ### Design
 ![DarkDarkGo Design](mgmt/doc/DarkDarkGo.png)
