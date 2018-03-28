@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
 """
     desc: API for getting/reading information from chunks, knowing the chunk's id
+    author: Linh Hoang
 """
 import os
-from chunk_reader.constants import PATH
 
 def get_chunk_header(chunk_id):
     """
@@ -13,7 +13,7 @@ def get_chunk_header(chunk_id):
     :return: dictionary or None
     chunk_map = {0: int, 1: int, 2: int, 3: int, 4: int}
     """
-    path = PATH
+    path = '/data'
     chunk_path = os.path.join(path, chunk_id)
     if os.path.exists(chunk_path):
         chunk_map = {}
@@ -60,7 +60,7 @@ def get_document_header(chunk_map, doc_id, chunk_id):
                'title_length': int, 'html_start': int, 'html_length': int}
     """
     doc_map = {}
-    path = PATH
+    path = '/data'
     chunk_path = os.path.join(path, chunk_id)
     if os.path.exists(chunk_path):
         with open(chunk_path, 'rb') as chunk:
@@ -118,7 +118,7 @@ def get_chunks():
     a list of chunk ids it holds currently on disk.
     :return: list of ids
     """
-    path = PATH
+    path = '/data'
     chunks = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))] # list of all files in that directory
     return chunks
 
@@ -147,7 +147,7 @@ def get_doc(chunk_id, doc_id):
     :param doc_id: int
     :return: dictionary or None
     """
-    path = PATH
+    path = '/data'
     chunk_path = os.path.join(path, chunk_id)
     chunk_map = get_chunk_header(chunk_id)
     doc_map = get_document_header(chunk_map, doc_id, chunk_id)
@@ -174,7 +174,7 @@ def get_link(chunk_id, doc_id):
     :param doc_id: int
     :return: dictionary or None
     """
-    path = PATH
+    path = '/data'
     chunk_path = os.path.join(path, chunk_id)
     chunk_map = get_chunk_header(chunk_id)
     doc_map = get_document_header(chunk_map, doc_id, chunk_id)
@@ -197,7 +197,7 @@ def get_title(chunk_id, doc_id):
     :param doc_id: int
     :return: dictionary or None
     """
-    path = PATH
+    path = '/data'
     chunk_path = os.path.join(path, chunk_id)
     chunk_map = get_chunk_header(chunk_id)
     doc_map = get_document_header(chunk_map, doc_id, chunk_id)
@@ -220,7 +220,7 @@ def get_raw_html(chunk_id, doc_id):
     :param doc_id: int
     :return: dictionary or None
     """
-    path = PATH
+    path = '/data'
     chunk_path = os.path.join(path, chunk_id)
     chunk_map = get_chunk_header(chunk_id)
     doc_map = get_document_header(chunk_map, doc_id, chunk_id)
