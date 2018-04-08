@@ -1,6 +1,6 @@
 # DarkDarkGo
 
-**DarkDarkGo** is an scalable search engine for the dark web. The goal of the
+**DarkDarkGo** is a scalable search engine for the dark web. The goal of the
 project is to build a simple, robust search engine from scratch that can search
 through the dark web content.
 
@@ -21,13 +21,15 @@ product.
 
 ![DarkDarkGo Design](mgmt/doc/DarkDarkGo.png)
 
-- Crawler: Crawls the onion websites
-- Index Builder: Builds index chunk
-- Index Server: Stores replicated index chunk
-- MGMT: Serves as single master, schedules jobs for other servers and executes
+### Components
+
+- [Crawler:](crawler) Crawls the onion websites
+- [Index Builder:](indexer) Builds index chunk
+- [Index Server:](index-server) Stores replicated index chunk
+- [MGMT:](mgmt) Serves as single master, schedules jobs for other servers and executes
   heartbeats messages
-- Front-End: Serves a website with Google-like interface
-- Back-End: Express server with caching and aggregation logic
+- [Front-End:](frontend) Serves a website with Google-like interface
+- [Back-End:](webserver) Express server with caching and aggregation logic
 
 ## Testing
 
