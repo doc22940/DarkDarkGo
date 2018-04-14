@@ -1,13 +1,17 @@
 # DarkDarkGo
 
+![build-success](https://img.shields.io/badge/build-success-brightgreen.svg)
+![test-passing](https://img.shields.io/badge/test-passing-brightgreen.svg)
+![status-wip](https://img.shields.io/badge/status-work_in_progress-green.svg)
+
 **DarkDarkGo** is a scalable search engine for the dark web. The goal of the
 project is to build a simple, robust search engine from scratch that can search
 through the dark web content.
 
 ## Project Status
 
-It is still a work-in-progress. The last time we tested (December 2017), the
-dark web did not give us enough results to serve for a query. However, each
+It is still a work in progress. The last time we tested (December 2017), the
+dark web did not give us enough results to serve a query. However, each
 component was working and tested separately. Hence, this project can be
 used as a foundation to add more interesting features and build a more complex
 product.
