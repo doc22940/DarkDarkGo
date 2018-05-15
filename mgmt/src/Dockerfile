@@ -1,6 +1,9 @@
 FROM ubuntu:latest
 MAINTAINER Hoanh An <hoanhan@bennington.edu>
 
+# Install gnupg package
+RUN apt-get update && apt-get install -my wget gnupg
+
 # Add the PostgreSQL PGP key to verify their Debian packages.
 RUN apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8
 
@@ -32,15 +35,12 @@ USER postgres
 RUN    /etc/init.d/postgresql start &&\
     createdb -O postgres mgmt_db
 
-#    psql --command "CREATE USER docker WITH SUPERUSER PASSWORD 'docker';" &&\
-
 # Adjust PostgreSQL configuration so that remote connections to the
 # database are possible.
 RUN echo "host all  all    0.0.0.0/0  md5" >> /etc/postgresql/9.3/main/pg_hba.conf
 
 # And add ``listen_addresses`` to ``/etc/postgresql/9.3/main/postgresql.conf``
 RUN echo "listen_addresses='*'" >> /etc/postgresql/9.3/main/postgresql.conf
-
 
 # Add working directory
 ADD . /src
@@ -49,7 +49,6 @@ WORKDIR /src
 EXPOSE 5000
 
 # Note: PostgresQL run on port 5432
-
 ENV FLASK_APP=device_manager_server.py
 
 CMD ./start.sh
