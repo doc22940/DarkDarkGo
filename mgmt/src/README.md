@@ -100,8 +100,7 @@ index_server
   They will get 5 chunks every time they ask us. 
 
 ### Index Server
-- If an index chunk is successfully built, insert its chunk id to Index Server relation.
-- TODO: CHOOSE A DISTRIBUTING ALGORITHM
+- If an index chunk is successfully built, distribute its chunk id to Index Server relation.
 
 ### How to install on Mac:
 - Install [Posgres.app](https://postgresapp.com)
