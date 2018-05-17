@@ -19,6 +19,8 @@ product.
 ## Table of Contents
 
 - [Architecture](#architecture)
+- [API](mgmt/doc/api.md)
+- [Flow](mgmt/doc/flow.md)
 - [Testing](#testing)
 
 ## Architecture
