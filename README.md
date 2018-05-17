@@ -19,8 +19,6 @@ product.
 ## Table of Contents
 
 - [Architecture](#architecture)
-- [API](mgmt/doc/api.md)
-- [Flow](mgmt/doc/flow.md)
 - [Testing](#testing)
 
 ## Architecture
@@ -36,6 +34,11 @@ product.
   heartbeats messages
 - [Front-End:](frontend) Serves a website with Google-like interface
 - [Back-End:](webserver) Express server with caching and aggregation logic
+
+### Flow
+
+- [API](mgmt/doc/api.md)
+- [Flow](mgmt/doc/flow.md)
 
 ## Testing
 
