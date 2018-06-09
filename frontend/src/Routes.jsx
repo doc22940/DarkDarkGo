@@ -6,6 +6,7 @@ import SearchPage from './SearchPage/SearchPage';
 import F04Page from './404Page/404Page';
 
 export default () => {
+    return (
     <Switch>
         <Route exact path="/" render={props => <LandingPage {...props} /> } />
 
