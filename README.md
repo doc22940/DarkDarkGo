@@ -2,7 +2,6 @@
 
 ![build-success](https://img.shields.io/badge/build-success-brightgreen.svg)
 ![test-passing](https://img.shields.io/badge/test-passing-brightgreen.svg)
-![status-wip](https://img.shields.io/badge/status-work_in_progress-green.svg)
 
 **DarkDarkGo** is a scalable search engine for the dark web. The goal of the
 project is to build a simple, robust search engine from scratch that can search
@@ -16,16 +15,11 @@ component was working and tested separately. Hence, this project can be
 used as a foundation to add more interesting features and build a more complex
 product.
 
-## Table of Contents
-
-- [Architecture](#architecture)
-- [Testing](#testing)
-
 ## Architecture
 
 ![DarkDarkGo Design](mgmt/doc/DarkDarkGo.png)
 
-### Components
+**Components**
 
 - [Crawler:](crawler) Crawls the onion websites
 - [Index Builder:](indexer) Builds index chunk
@@ -35,10 +29,9 @@ product.
 - [Front-End:](frontend) Serves a website with Google-like interface
 - [Back-End:](webserver) Express server with caching and aggregation logic
 
-### Flow
-
+**API**
 - [API](mgmt/doc/api.md)
-- [Flow](mgmt/doc/flow.md)
+- [Sample flow](mgmt/doc/flow.md)
 
 ## Testing
 
