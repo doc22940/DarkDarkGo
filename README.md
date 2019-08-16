@@ -10,8 +10,8 @@ through the dark web content.
 
 ## Project Status
 
-It is still a work in progress. The last time we tested (December 2017), the
-dark web did not give us enough results to serve a query. However, each
+It is a work in progress. The last time we tested (December 2017), the
+dark web did not give us enough meaningful results to serve a query. However, each
 component was working and tested separately. Hence, this project can be
 used as a foundation to add more interesting features and build a more complex
 product.
