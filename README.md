@@ -36,3 +36,7 @@ product.
 ## Testing
 
 Each component has its own Dockerfile that is ready to be built and tested.
+
+## Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/Bennington-Distributed-Systems-2017/DarkDarkGo.svg)](https://starchart.cc/Bennington-Distributed-Systems-2017/DarkDarkGo)
