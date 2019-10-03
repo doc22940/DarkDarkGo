@@ -1,7 +1,7 @@
 # DarkDarkGo
 
-![build-success](https://img.shields.io/badge/build-success-brightgreen.svg)
-![test-passing](https://img.shields.io/badge/test-passing-brightgreen.svg)
+![](https://img.shields.io/github/stars/Bennington-Distributed-Systems-2017/DarkDarkGo)
+![](https://img.shields.io/github/forks/Bennington-Distributed-Systems-2017/DarkDarkGo)
 
 **DarkDarkGo** is a scalable search engine for the dark web. The goal of the
 project is to build a simple, robust search engine from scratch that can search
